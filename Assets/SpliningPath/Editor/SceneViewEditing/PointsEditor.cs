@@ -119,7 +119,19 @@ namespace SpliningPath.Editor.SceneViewEditing
 
         private void MovePoint(int selection, Vector3 position)
         {
+            bool magnet;
+            PointInfo pointInfo = Spline.GetPointInfo(selection);
+            Vector3 delta = position - Spline[selection];
             Spline[selection] = position;
+            if ((pointInfo & PointInfo.Reference) != 0)
+            {
+                magnet = (pointInfo & PointInfo.Sticky) != 0;
+                if(!magnet)return;
+                if (selection > 0) Spline[selection - 1] += delta;
+                if (selection < Spline.Count - 1) Spline[selection + 1] += delta;
+                return;
+            }
+
         }
 
     }

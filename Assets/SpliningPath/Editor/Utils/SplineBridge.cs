@@ -94,16 +94,21 @@ namespace SpliningPath.Editor.Utils
 
         public void SetPointInfo(int index, PointInfo info)
         {
+            var flags = _flags.GetArrayElementAtIndex(index).intValue;
             _flags.GetArrayElementAtIndex(index).intValue = (int) info;
+            if((PointInfo)(flags ^ (int)info) == PointInfo.Sticky)return;
+
             if ((info & PointInfo.Control) == PointInfo.Control || index >= Count)
                 return;
-            //Normalize control points
+
+            if(index >= Count -1)return;
             int p0 = index + 1;//Control
             int p1 = index + 2;//Control
             int p3 = index + 3;//Next ref point of the segment
             Vector3 pos0 = this[index];
             Vector3 pos1 = this[p3];
 
+            //Normalize control points
             RemoveFlags(p0, PointInfo.Linear, PointInfo.Quadratic, PointInfo.Cubiq);
             RemoveFlags(p1, PointInfo.Linear, PointInfo.Quadratic, PointInfo.Cubiq);
 
