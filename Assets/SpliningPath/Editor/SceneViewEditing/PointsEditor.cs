@@ -122,6 +122,7 @@ namespace SpliningPath.Editor.SceneViewEditing
 
         private void MovePoint(int selection, Vector3 position)
         {
+            //TODO: Implement chanin movement
             PointInfo pointInfo = Spline.GetPointInfo(selection);
             bool magnet = (pointInfo & PointInfo.Sticky) != 0;
             Vector3 delta = position - Spline[selection];
@@ -129,8 +130,8 @@ namespace SpliningPath.Editor.SceneViewEditing
             if ((pointInfo & PointInfo.Reference) != 0)
             {
                 if(!magnet)return;
-                if (selection > 0) Spline[selection - 1] += delta;
-                if (selection < Spline.Count - 1) Spline[selection + 1] += delta;
+                if (selection > 0)Spline[selection - 1] += delta;
+                if (selection < Spline.Count - 1)Spline[selection + 1] += delta;
                 return;
             }
             if ((pointInfo & PointInfo.Quadratic) != 0)
@@ -138,9 +139,18 @@ namespace SpliningPath.Editor.SceneViewEditing
                 //Move both control point of a segment
                 int @ref = Spline.GetReferenceIndex(selection);
                 Spline[selection + (selection - @ref)] = position;
-                return;
             }
-
+            if ((pointInfo & PointInfo.Sticky) != 0)
+            {
+                int @ref = Spline.GetReferenceIndex(selection);
+                int opposite = @ref + (@ref - selection);
+                if(opposite < 0 || opposite > Spline.Count)return;
+                Vector3 t = Spline[@ref];
+                delta = t - position;
+                delta.Normalize();
+                float dist = Vector3.Distance(t, position);
+                Spline[opposite] = t + delta * dist;
+            }
         }
 
     }
