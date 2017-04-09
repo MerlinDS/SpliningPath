@@ -98,7 +98,7 @@ namespace SpliningPath.Editor.Utils
             return (CreationType)GUI.Toolbar(position, -1, _creationControls, ButtonStyle);
         }
 
-        public static bool PointTypeControls(SplineContent point, out PointInfo info)
+        public static bool PointTypeControls(SplineContent point, out PointInfo info, int count)
         {
             Rect controlsRect = EditorGUILayout.GetControlRect(false, 23f);
             Rect position = new Rect(controlsRect.xMin, controlsRect.yMin,
@@ -114,7 +114,7 @@ namespace SpliningPath.Editor.Utils
             //Parse bools to flags
             info = isRef ? PointInfo.Reference : PointInfo.Control;
             //Draw controls
-            if (isRef)
+            if (isRef && point.Index < count - 1)
             {
                 EditorGUI.BeginChangeCheck();
                 typeSelection = GUI.Toolbar(position, typeSelection, _typeControls, ButtonStyle);

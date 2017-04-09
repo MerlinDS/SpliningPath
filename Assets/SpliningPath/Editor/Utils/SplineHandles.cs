@@ -23,20 +23,36 @@ namespace SpliningPath.Editor.Utils
         //================================    Systems properties    =================================
 
         //================================      Public methods      =================================
-        public static void DrawSegments(SplineContent[] contents)
+        public static void DrawSegments(SplineContent[] contents, int selection)
         {
             foreach (SplineContent content in contents)
-                DrawSegment(content);
+            {
+                Color color = SPSettings.Current.GetLineColor(content.ParentId);
+                if (content.IsSelected(selection)) color = SPSettings.Current.Selection;
+                DrawSegment(content, color);
+            }
         }
 
-        public static void DrawSegment(SplineContent segment)
+        public static void DrawNormals(SplineContent[] contents, int selection)
+        {
+            foreach (SplineContent content in contents)
+            {
+                Color color = SPSettings.Current.Normals;
+                if (content.IsSelected(selection)) color = SPSettings.Current.Selection;
+                DrawSegment(content, color, true);
+            }
+        }
+
+        public static void DrawSegment(SplineContent segment, Color color, bool dotted = false)
         {
             float weight = SPSettings.Current.LineWeight;
-            Color color = SPSettings.Current.GetLineColor(segment.ParentId);
             var current = Handles.color;
             Handles.color = color;
             if ((segment.Info & PointInfo.Linear) == PointInfo.Linear)
-                Handles.DrawLine(segment.P0, segment.P3);
+            {
+                if(dotted) Handles.DrawDottedLine(segment.P0, segment.P3, 5F);
+                else Handles.DrawLine(segment.P0, segment.P3);
+            }
             else
             {
                 Handles.DrawBezier(segment.P0, segment.P3, segment.P1,

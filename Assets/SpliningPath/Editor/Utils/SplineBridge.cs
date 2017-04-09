@@ -191,7 +191,7 @@ namespace SpliningPath.Editor.Utils
             return -1;
         }
 
-        public SplineContent[] GetPoints(PointInfo filter = Scripts.Core.PointInfo.Reference)
+        public SplineContent[] GetPoints(PointInfo filter = PointInfo.Reference)
         {
             int n = Count;
             List<SplineContent> result = new List<SplineContent>();
@@ -201,6 +201,19 @@ namespace SpliningPath.Editor.Utils
                 if ((info & filter) == 0) continue;
                 SplineContent content = new SplineContent(this[i], info, i, _spline.GetInstanceID());
                 result.Add(content);
+            }
+            return result.ToArray();
+        }
+
+        public int[] GetPointsIndexes(PointInfo filter = PointInfo.Reference)
+        {
+            int n = Count;
+            List<int> result = new List<int>();
+            for (int i = 0; i < n; i++)
+            {
+                PointInfo info = GetPointInfo(i);
+                if ((info & filter) == 0) continue;
+                result.Add(i);
             }
             return result.ToArray();
         }
@@ -215,7 +228,7 @@ namespace SpliningPath.Editor.Utils
                 if (index < 0 || index >= Count) continue;
                 PointInfo info = GetPointInfo(index);
 
-                SplineContent content = new SplineContent(this[index], info, i, _spline.GetInstanceID());
+                SplineContent content = new SplineContent(this[index], info, index, _spline.GetInstanceID());
                 result[i] = content;
             }
             return result.ToArray();
@@ -230,20 +243,61 @@ namespace SpliningPath.Editor.Utils
             return content;
         }
 
+        public int GetReferenceIndex(int selection)
+        {
+            if((GetPointInfo(selection) & PointInfo.Reference) == PointInfo.Reference)
+                return selection;
+            if (selection > 0 && (GetPointInfo(selection - 1) & PointInfo.Reference) == PointInfo.Reference)
+                return selection - 1;
+            if (selection < Count - 1 && (GetPointInfo(selection + 1) & PointInfo.Reference) == PointInfo.Reference)
+                return selection + 1;
+            return -1;
+        }
+
         public SplineContent[] GetSegments(PointInfo filter =
-            PointInfo.Linear | PointInfo.Quadratic | PointInfo.Cubiq)
+            PointInfo.Linear | PointInfo.Quadratic | PointInfo.Cubiq )
         {
             int n = SegmentsCount;
             List<SplineContent> result = new List<SplineContent>();
             for (int i = 0; i < n; i++)
             {
-                int index = i * Spline.VLen * Spline.SLen;
+                int index = i * (Spline.SLen - 1);
                 PointInfo info = GetPointInfo(index);
                 if ((info & filter) == 0) continue;
                 SplineContent content = new SplineContent(
                     this[index], this[index + 1], this[index + 2], this[index + 3],
                     info, i, _spline.GetInstanceID());
                 result.Add(content);
+            }
+            return result.ToArray();
+        }
+
+        public SplineContent[] GetNormals(int point = -1)
+        {
+            int n = SegmentsCount + 1;
+            if (point < 0) point = 0;
+            else
+            {
+                point = GetReferenceIndex(point) / (Spline.SLen - 1);
+                n = point + 1;
+            }
+            PointInfo filter = PointInfo.Quadratic | PointInfo.Cubiq;
+            List<SplineContent> result = new List<SplineContent>();
+            for (int i = point; i < n; i++)
+            {
+                int index = i * (Spline.SLen - 1);
+                PointInfo left = index < Count - 1 ? GetPointInfo(index + 1) : PointInfo.Linear;
+                PointInfo right = index > 0 ? GetPointInfo(index - 1) : PointInfo.Linear;
+                if ((left & filter) != 0)
+                {
+                    result.Add( new SplineContent( this[index], Vector3.zero, Vector3.zero, this[index + 1],
+                        PointInfo.Linear, index, _spline.GetInstanceID()));
+                }
+                if ((right & filter) != 0)
+                {
+                    result.Add( new SplineContent( this[index], Vector3.zero, Vector3.zero, this[index - 1],
+                        PointInfo.Linear, index, _spline.GetInstanceID()));
+                }
             }
             return result.ToArray();
         }
@@ -255,7 +309,7 @@ namespace SpliningPath.Editor.Utils
         }
 
 
-        #region Custructing
+        #region Costructing
 
         public SplineBridge([NotNull] SerializedObject serializedObject)
         {
@@ -305,5 +359,6 @@ namespace SpliningPath.Editor.Utils
         }
 
         #endregion
+
     }
 }

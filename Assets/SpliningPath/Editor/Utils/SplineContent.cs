@@ -17,6 +17,7 @@ namespace SpliningPath.Editor.Utils
         //================================       Public Setup       =================================
         /// <inheritdoc />
         public readonly Vector3 P0;
+
         public readonly Vector3 P1;
         public readonly Vector3 P2;
         public readonly Vector3 P3;
@@ -24,6 +25,7 @@ namespace SpliningPath.Editor.Utils
 
         public readonly int Index;
         public readonly int ParentId;
+
         public readonly int InternalHash;
         //================================    Systems properties    =================================
 
@@ -39,12 +41,19 @@ namespace SpliningPath.Editor.Utils
         }
 
         public SplineContent(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3,
-            PointInfo info, int index, int parentId) : this (p0, info, index, parentId)
+            PointInfo info, int index, int parentId) : this(p0, info, index, parentId)
         {
             P1 = p1;
             P2 = p2;
             P3 = p3;
         }
+
+        public bool IsSelected(int selection)
+        {
+            return Index == selection || Index + 1 == selection ||
+                   Index + 2 == selection || Index + 3 == selection;
+        }
+
         //================================ Private|Protected methods ================================
     }
 }

@@ -43,7 +43,7 @@ namespace SpliningPath.Editor.SceneViewEditing
         protected virtual void OnSceneGUI()
         {
             Spline.Update();
-            SplineHandles.DrawSegments(Spline.GetSegments());
+            SplineHandles.DrawSegments(Spline.GetSegments(), -1);
 
             EditorGUI.BeginChangeCheck();
             var position = Handles.PositionHandle(Spline.Midpoint, Quaternion.identity);

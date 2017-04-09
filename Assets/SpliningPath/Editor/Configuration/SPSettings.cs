@@ -4,7 +4,6 @@
 // <author>Andrew Salomatin</author>
 // <date>03/26/2017 9:31</date>
 
-using System.Collections.Generic;
 using System.Text;
 using SpliningPath.Editor.Utils;
 using UnityEditor;

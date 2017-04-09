@@ -5,41 +5,30 @@
 // <date>03/27/2017 16:22</date>
 
 using SpliningPath.Editor.Utils;
-using UnityEditor;
+using SpliningPath.Scripts.Core;
 
 namespace SpliningPath.Editor.SceneViewEditing
 {
     /// <summary>
     /// EveryPointsEditor
     /// </summary>
-    public class EveryPointsEditor : UnityEditor.Editor
+    public class EveryPointsEditor : PointsEditor
     {
         //================================       Public Setup       =================================
 
         //================================    Systems properties    =================================
-        private SplineBridge _spline;
         //================================      Public methods      =================================
-        /// <inheritdoc />
-        public override void OnInspectorGUI()
-        {
-            EditorGUILayout.HelpBox("Every points mode: Editing a all point.", MessageType.Info);
-        }
-
+        //EditorGUILayout.HelpBox("Every points mode: Editing a all point.", MessageType.Info);
         //================================ Private|Protected methods ================================
         /// <inheritdoc />
-        protected void OnEnable()
+        protected override SplineContent[] FilterPoints(int selection)
         {
-            _spline= new SplineBridge(serializedObject);
+            return Spline.GetPoints(PointInfo.Reference | PointInfo.Cubiq | PointInfo.Quadratic);
         }
 
-        /// <inheritdoc />
-        protected void OnDisable()
+        protected override SplineContent[] FilterNormals(int selection)
         {
-            _spline = null;
-        }
-
-        private void OnSceneGUI()
-        {
+            return Spline.GetNormals();
         }
     }
 }

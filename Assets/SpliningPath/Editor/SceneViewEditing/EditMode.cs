@@ -154,7 +154,7 @@ namespace SpliningPath.Editor.SceneViewEditing
             {
                 {SceneViewEditMode.Spline, typeof(SplineEditor)},
                 {SceneViewEditMode.EveryPoint, typeof(EveryPointsEditor)},
-                {SceneViewEditMode.OnePoint, typeof(OnePointEditor)}
+                {SceneViewEditMode.OnePoint, typeof(PointsEditor)}
             });
         }
 
