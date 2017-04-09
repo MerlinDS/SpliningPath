@@ -41,11 +41,6 @@ namespace SpliningPath.Editor.Utils
 
         #region Paramenters
 
-        public int InstanceId
-        {
-            get { return _spline.GetInstanceID(); }
-        }
-
         public Vector3 this[int i]
         {
             get
@@ -169,31 +164,8 @@ namespace SpliningPath.Editor.Utils
         /// <inheritdoc cref="SerializedObject.ApplyModifiedProperties"/>
         public bool ApplyModifiedProperties()
         {
+            _sf.floatValue = 1.0F / _spline.SegmentsCount;
             return _serializedObject.ApplyModifiedProperties();
-        }
-
-        public bool PointInfoHas(int index, PointInfo type)
-        {
-            if (Count <= index) return false;
-            var info = (PointInfo) _flags.GetArrayElementAtIndex(index).intValue;
-            return (info & type) == type;
-        }
-
-        public int GetPointHash(int index)
-        {
-            return GetHashCode() + index;
-        }
-
-        public int GetPointIndex(int hash)
-        {
-            int count = Count;
-            int hashCode = GetHashCode();
-            for (int i = 0; i < count; i++)
-            {
-                if (hashCode + i != hash) continue;
-                return i;
-            }
-            return -1;
         }
 
         public SplineContent[] GetPoints(PointInfo filter = PointInfo.Reference)
@@ -271,7 +243,7 @@ namespace SpliningPath.Editor.Utils
                 if ((info & filter) == 0) continue;
                 SplineContent content = new SplineContent(
                     this[index], this[index + 1], this[index + 2], this[index + 3],
-                    info, i, _spline.GetInstanceID());
+                    info, index, _spline.GetInstanceID());
                 result.Add(content);
             }
             return result.ToArray();
@@ -365,5 +337,34 @@ namespace SpliningPath.Editor.Utils
 
         #endregion
 
+        public void AddLeftPoint(int index)
+        {
+            int i, n;
+            Vector3 start;
+            Vector3 vector;
+            if (index == Count - 1)
+            {
+                start = this[index];
+                //get opposite point
+                vector = (GetPointInfo(index - Spline.VLen) & PointInfo.Linear) != 0
+                    ? this[index - Spline.VLen]
+                    : this[index - 1];
+                vector = start - vector;
+                vector.Normalize();
+                n = Spline.VLen * (Spline.SLen - 1);//One point already exist
+                int cIndex = index * Spline.VLen + 2;
+                //increase coordinates array
+                for (i = 1; i <= n; i++) _coodrinates.InsertArrayElementAtIndex(cIndex + i);
+                n = Spline.SLen - 1;
+                for (i = 1; i <= n; i++)
+                {
+                    var j = index + i;
+                    _flags.InsertArrayElementAtIndex(j);
+                    this[j] = start + vector * 0.1F * i;
+                    _flags.GetArrayElementAtIndex(j).intValue = (int)(PointInfo.Linear |
+                        (i < n ? PointInfo.Control : PointInfo.Reference));
+                }
+            }
+        }
     }
 }

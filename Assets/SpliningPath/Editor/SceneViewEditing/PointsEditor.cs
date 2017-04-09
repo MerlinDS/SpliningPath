@@ -30,7 +30,7 @@ namespace SpliningPath.Editor.SceneViewEditing
             if(_selection < 0)return;
             Spline.Update();
             var needToUpdate = SplineGUILayout.PointField(Spline, _selection);
-            var create = SplineGUILayout.PointCreationControls(Spline.GetPointInfo(_selection));
+            var action = SplineGUILayout.PointCreationControls(Spline.GetPointInfo(_selection));
 
             PointInfo info;
             if (SplineGUILayout.PointTypeControls(Spline.GetPoint(_selection), out info, Spline.Count))
@@ -39,9 +39,12 @@ namespace SpliningPath.Editor.SceneViewEditing
                 needToUpdate = true;
             }
 
-            if (create != SplineGUILayout.CreationType.None)
+            if (action != SplineGUILayout.CreationType.None)
             {
                 //TODO: Add creation methods
+                if (action == SplineGUILayout.CreationType.AddLeft)
+                    Spline.AddLeftPoint(_selection);
+                needToUpdate = true;
             }
             if(!needToUpdate)return;
             Spline.ApplyModifiedProperties();
@@ -135,7 +138,9 @@ namespace SpliningPath.Editor.SceneViewEditing
                 //Move both control point of a segment
                 int @ref = Spline.GetReferenceIndex(selection);
                 Spline[selection + (selection - @ref)] = position;
+                return;
             }
+
         }
 
     }

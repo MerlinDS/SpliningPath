@@ -48,7 +48,7 @@ namespace SpliningPath.Scripts.Core
         ///     <code>int count = (int) ((_points.arraySize / VLen) - 1.0F) / Concatenator</code>
         /// </para>
         /// </summary>
-        /*[SerializeField] *//*[HideInInspector]*/ private float _sf = 1.0F;
+        [SerializeField] [HideInInspector] private float _sf = 1.0F;
         /// <summary>
         /// The array of evaluation points. Set by <see cref="Evaluate">evaluation function</see>
         /// and represents a segment of current spline.
